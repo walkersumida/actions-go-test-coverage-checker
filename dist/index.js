@@ -2712,7 +2712,35 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const path = (0, core_1.getInput)('path', { required: false });
         const threshold = (0, core_1.getInput)('threshold', { required: false });
-        child_process_1.default.execSync(`../sh/main.sh ${path} ${threshold}`);
+        var shell = `
+argPath=${path}
+argThreshold=${threshold}
+
+go test -cover $argPath -coverprofile=cover.out
+
+tests=\`go tool cover -func=cover.out\`
+failed=false
+
+echo "Threshold: $argThreshold"
+
+while IFS= read -r t
+do
+  num=\`echo $t | grep -Eo '[0-9]+\.[0-9]+'\`
+  if (( $(echo "$num < $argThreshold" | bc -l) )) ; then
+    COLOR=red;
+    failed=true
+    echo $t;
+  else
+    COLOR=green;
+    echo $t;
+  fi
+done <<< "$tests"
+
+if $failed ; then
+  echo "Failed"
+  exit 1
+fi`;
+        child_process_1.default.execSync(shell);
     }
     catch (error) {
         (0, core_1.setFailed)(error.message);
