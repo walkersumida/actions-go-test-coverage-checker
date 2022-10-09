@@ -2711,7 +2711,8 @@ const child_process_1 = __importDefault(__nccwpck_require__(81));
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const path = (0, core_1.getInput)('path', { required: false });
-        let buf = child_process_1.default.execSync('go test -v ' + path);
+        const threshold = (0, core_1.getInput)('threshold', { required: false });
+        child_process_1.default.execFileSync(`../sh/main.sh ${path} ${threshold}`);
     }
     catch (error) {
         (0, core_1.setFailed)(error.message);

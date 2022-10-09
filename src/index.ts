@@ -6,7 +6,7 @@ const run = async () => {
     const path = getInput('path', {required: false});
     const threshold = getInput('threshold', {required: false});
 
-    cp.execFileSync(`./main.sh ${path} ${threshold}`)
+    cp.execFileSync(`../sh/main.sh ${path} ${threshold}`)
   } catch (error: any) {
     setFailed(error.message);
   }
