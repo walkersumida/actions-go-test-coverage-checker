@@ -1,7 +1,6 @@
 import {getInput, setFailed} from '@actions/core';
 import cp from 'child_process';
 
-
 const run = async () => {
   try {
     const path = getInput('path', {required: false});
@@ -33,9 +32,9 @@ done <<< "$tests"
 if $failed ; then
   echo "Failed"
   exit 1
-fi`
+fi`;
 
-    cp.execSync(shell)
+    cp.execSync(shell, {shell: '/bin/bash'});
   } catch (error: any) {
     setFailed(error.message);
   }

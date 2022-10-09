@@ -2740,7 +2740,7 @@ if $failed ; then
   echo "Failed"
   exit 1
 fi`;
-        child_process_1.default.execSync(shell);
+        child_process_1.default.execSync(shell, { shell: '/bin/bash' });
     }
     catch (error) {
         (0, core_1.setFailed)(error.message);
