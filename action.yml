@@ -1,0 +1,14 @@
+name: "Go test coverage checker"
+description: "Check test coverage"
+author: "@walkersumida"
+branding:
+  icon: "code"
+  color: "yellow"
+inputs:
+  path:
+    description: "target path"
+    default: "./..."
+    required: false
+runs:
+  using: "node16"
+  main: "dist/index.js"
