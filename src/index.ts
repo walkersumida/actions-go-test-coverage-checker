@@ -1,11 +1,10 @@
 import {getInput, setFailed} from '@actions/core';
 import cp from 'child_process';
 
-const run = async () => {
-  try {
-    const path = getInput('path', {required: false});
-    const threshold = getInput('threshold', {required: false});
-    var shell = `#!/bin/bash
+const buildShell = (): string => {
+  const path = getInput('path', {required: false});
+  const threshold = getInput('threshold', {required: false});
+  return `#!/bin/bash
 argPath=${path}
 argThreshold=${threshold}
 
@@ -33,6 +32,11 @@ if $failed ; then
   echo "Failed"
   exit 1
 fi`;
+};
+
+const run = async () => {
+  try {
+    const shell = buildShell();
 
     cp.execSync(shell, {shell: '/bin/bash'});
   } catch (error: any) {

@@ -2708,11 +2708,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(186);
 const child_process_1 = __importDefault(__nccwpck_require__(81));
-const run = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const path = (0, core_1.getInput)('path', { required: false });
-        const threshold = (0, core_1.getInput)('threshold', { required: false });
-        var shell = `#!/bin/bash
+const buildShell = () => {
+    const path = (0, core_1.getInput)('path', { required: false });
+    const threshold = (0, core_1.getInput)('threshold', { required: false });
+    return `#!/bin/bash
 argPath=${path}
 argThreshold=${threshold}
 
@@ -2740,6 +2739,10 @@ if $failed ; then
   echo "Failed"
   exit 1
 fi`;
+};
+const run = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const shell = buildShell();
         child_process_1.default.execSync(shell, { shell: '/bin/bash' });
     }
     catch (error) {
