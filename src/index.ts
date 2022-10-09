@@ -6,6 +6,8 @@ const run = async () => {
     const path = getInput('path', {required: false});
     const threshold = getInput('threshold', {required: false});
     var shell = `#!/bin/bash
+sudo apt-get install -y bc
+
 argPath=${path}
 argThreshold=${threshold}
 
