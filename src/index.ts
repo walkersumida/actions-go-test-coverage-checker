@@ -4,7 +4,9 @@ import cp from 'child_process';
 const run = async () => {
   try {
     const path = getInput('path', {required: false});
-    let buf = cp.execSync('go test -v ' + path);
+    const threshold = getInput('threshold', {required: false});
+
+    cp.execFileSync(`./main.sh ${path} ${threshold}`)
   } catch (error: any) {
     setFailed(error.message);
   }

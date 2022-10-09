@@ -9,6 +9,10 @@ inputs:
     description: "target path"
     default: "./..."
     required: false
+  threshold:
+    description: "test coverage threshold"
+    default: 80
+    required: false
 runs:
   using: "node16"
   main: "dist/index.js"
