@@ -1,9 +1,9 @@
-import {getInput, setFailed} from '@actions/core';
+import * as core from '@actions/core';
 import cp from 'child_process';
 
 const buildShell = (): string => {
-  const path = getInput('path', {required: false});
-  const threshold = getInput('threshold', {required: false});
+  const path = core.getInput('path', {required: false});
+  const threshold = core.getInput('threshold', {required: false});
   return `#!/bin/bash
 argPath=${path}
 argThreshold=${threshold}
@@ -38,9 +38,12 @@ const run = async () => {
   try {
     const shell = buildShell();
 
-    cp.execSync(shell, {shell: '/bin/bash'});
+    core.startGroup('go test coverage');
+    let goEnv = (cp.execSync(shell, {shell: '/bin/bash'}) || '').toString();
+    core.info(goEnv);
+    core.endGroup();
   } catch (error: any) {
-    setFailed(error.message);
+    core.setFailed(error.message);
   }
 };
 
