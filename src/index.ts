@@ -6,7 +6,7 @@ const run = async () => {
   try {
     const path = getInput('path', {required: false});
     const threshold = getInput('threshold', {required: false});
-    var shell = `
+    var shell = `#!/bin/bash
 argPath=${path}
 argThreshold=${threshold}
 
