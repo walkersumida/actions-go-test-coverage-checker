@@ -30,6 +30,7 @@ done <<< "$tests"
 
 if $failed ; then
   echo "Failed"
+  exit 1
 fi`;
 };
 

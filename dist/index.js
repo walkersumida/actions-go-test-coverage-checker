@@ -2760,6 +2760,7 @@ done <<< "$tests"
 
 if $failed ; then
   echo "Failed"
+  exit 1
 fi`;
 };
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
