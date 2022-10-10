@@ -45,8 +45,8 @@ const run = async () => {
   } catch (error: any) {
     core.setFailed(error.status);
     core.setFailed(error.message);
-    core.setFailed(error.stderr);
-    core.setFailed(error.stdout);
+    core.setFailed(error.stderr.toString());
+    core.setFailed(error.stdout.toString());
   }
 };
 

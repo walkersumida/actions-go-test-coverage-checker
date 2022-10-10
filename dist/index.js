@@ -2774,8 +2774,8 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
     catch (error) {
         core.setFailed(error.status);
         core.setFailed(error.message);
-        core.setFailed(error.stderr);
-        core.setFailed(error.stdout);
+        core.setFailed(error.stderr.toString());
+        core.setFailed(error.stdout.toString());
     }
 });
 run();
