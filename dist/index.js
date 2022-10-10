@@ -2760,15 +2760,15 @@ done <<< "$tests"
 
 if $failed ; then
   echo "Failed"
-  exit 1
 fi`;
 };
+// TODO: ↑ exit 1するとその場で強制終了になるため、ログが出てこない。このexit 1以外に失敗したということを伝達する方法があるのか。またはこの exit 1の部分だけ別で実行すれば実行ログは出せるかも。
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const shell = buildShell();
         core.startGroup('go test coverage');
-        let goEnv = (child_process_1.default.execSync(shell, { shell: '/bin/bash' }) || '').toString();
-        core.info(goEnv);
+        let result = (child_process_1.default.execSync(shell, { shell: '/bin/bash' }) || '').toString();
+        core.info(result);
         core.endGroup();
     }
     catch (error) {
