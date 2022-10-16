@@ -2725,20 +2725,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(186));
-const child_process_1 = __importDefault(__nccwpck_require__(81));
-const buildShell = () => {
+const child_process_1 = __nccwpck_require__(81);
+const buildGoTestShell = () => {
     const path = core.getInput('path', { required: false });
-    const threshold = core.getInput('threshold', { required: false });
     return `#!/bin/bash
 argPath=${path}
-argThreshold=${threshold}
 
-go test $argPath -cover -coverprofile=cover.out
+go test $argPath -cover -coverprofile=cover.out`;
+};
+const buildCoverageShell = () => {
+    const threshold = core.getInput('threshold', { required: false });
+    return `#!/bin/bash
+argThreshold=${threshold}
 
 tests=\`go tool cover -func=cover.out\`
 failed=false
@@ -2763,19 +2763,27 @@ if $failed ; then
   exit 1
 fi`;
 };
+const output = (result) => {
+    if (result.status == 1) {
+        core.setFailed('Failed');
+        core.error(result.stdout.toString());
+    }
+    else {
+        core.info(result.stdout.toString());
+    }
+};
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const shell = buildShell();
-        core.startGroup('go test coverage');
-        let result = child_process_1.default.spawnSync(shell, { shell: '/bin/bash' });
-        const stdout = result.stdout.toString();
-        if (result.status == 1) {
-            core.setFailed('Failed');
-            core.error(stdout);
-        }
-        else {
-            core.info(stdout);
-        }
+        core.startGroup('go test');
+        const goTestShell = buildGoTestShell();
+        let result = (0, child_process_1.spawnSync)(goTestShell, { shell: '/bin/bash' });
+        let stdout = result.stdout.toString();
+        output(result);
+        core.endGroup();
+        core.startGroup('test coverage');
+        const coverageShell = buildCoverageShell();
+        result = (0, child_process_1.spawnSync)(coverageShell, { shell: '/bin/bash' });
+        output(result);
         core.endGroup();
     }
     catch (error) {
