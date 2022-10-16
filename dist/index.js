@@ -2774,7 +2774,7 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
             core.error(stdout);
         }
         else {
-            core.info(stdout);
+            core.debug(stdout);
         }
         core.endGroup();
     }

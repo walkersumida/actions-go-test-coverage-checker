@@ -47,7 +47,7 @@ const run = async () => {
       core.setFailed('Failed');
       core.error(stdout);
     } else {
-      core.info(stdout);
+      core.debug(stdout);
     }
     core.endGroup();
   } catch (error: any) {
