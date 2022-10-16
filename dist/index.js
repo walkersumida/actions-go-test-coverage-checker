@@ -2770,8 +2770,11 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         let result = child_process_1.default.spawnSync(shell, { shell: '/bin/bash' });
         const stdout = result.stdout.toString();
         const stderr = result.stderr.toString();
-        core.info(stdout);
-        core.error(stderr);
+        core.info("stdour: " + stdout);
+        core.error("stderr: " + stderr);
+        if (result.status == 1) {
+            core.setFailed(stdout);
+        }
         core.endGroup();
     }
     catch (error) {
