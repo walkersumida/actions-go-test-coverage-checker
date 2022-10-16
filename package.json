@@ -11,7 +11,8 @@
   "scripts": {
     "lint": "prettier --check **/*.ts",
     "lint:fix": "prettier --write **/*.ts",
-    "build": "ncc build src/index.ts -o dist"
+    "build": "ncc build src/index.ts -o dist",
+    "dev": "ncc build -w src/index.ts -o dist"
   },
   "repository": {
     "type": "git",

@@ -2767,8 +2767,11 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const shell = buildShell();
         core.startGroup('go test coverage');
-        let result = (child_process_1.default.execSync(shell, { shell: '/bin/bash' }) || '').toString();
-        core.info(result);
+        let result = child_process_1.default.spawnSync(shell, { shell: '/bin/bash' });
+        const stdout = result.stdout.toString();
+        const stderr = result.stderr.toString();
+        core.info(stdout);
+        core.error(stderr);
         core.endGroup();
     }
     catch (error) {
