@@ -42,12 +42,13 @@ const run = async () => {
     core.startGroup('go test coverage');
     let result = cp.spawnSync(shell, {shell: '/bin/bash'});
     const stdout = result.stdout.toString();
+    const stderr = result.stderr.toString();
 
     if (result.status == 1) {
       core.setFailed('Failed');
-      core.error('stderr: ' + stdout);
+      core.error(stderr);
     } else {
-      core.info('stdour: ' + stdout);
+      core.info(stdout);
     }
     core.endGroup();
   } catch (error: any) {
