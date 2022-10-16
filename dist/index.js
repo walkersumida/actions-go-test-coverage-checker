@@ -2738,7 +2738,7 @@ const buildShell = () => {
 argPath=${path}
 argThreshold=${threshold}
 
-go test -cover $argPath -coverprofile=cover.out
+go test $argPath -cover -coverprofile=cover.out
 
 tests=\`go tool cover -func=cover.out\`
 failed=false
@@ -2769,11 +2769,12 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         core.startGroup('go test coverage');
         let result = child_process_1.default.spawnSync(shell, { shell: '/bin/bash' });
         const stdout = result.stdout.toString();
-        const stderr = result.stderr.toString();
-        core.info("stdour: " + stdout);
-        core.error("stderr: " + stderr);
         if (result.status == 1) {
-            core.setFailed(stdout);
+            core.setFailed('Failed');
+            core.error('stderr: ' + stdout);
+        }
+        else {
+            core.info('stdour: ' + stdout);
         }
         core.endGroup();
     }

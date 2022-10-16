@@ -4,11 +4,12 @@ import cp from 'child_process';
 const buildShell = (): string => {
   const path = core.getInput('path', {required: false});
   const threshold = core.getInput('threshold', {required: false});
+
   return `#!/bin/bash
 argPath=${path}
 argThreshold=${threshold}
 
-go test -cover $argPath -coverprofile=cover.out
+go test $argPath -cover -coverprofile=cover.out
 
 tests=\`go tool cover -func=cover.out\`
 failed=false
@@ -41,11 +42,12 @@ const run = async () => {
     core.startGroup('go test coverage');
     let result = cp.spawnSync(shell, {shell: '/bin/bash'});
     const stdout = result.stdout.toString();
-    const stderr = result.stderr.toString();
-    core.info("stdour: " + stdout);
-    core.error("stderr: " + stderr);
+
     if (result.status == 1) {
-      core.setFailed(stdout);
+      core.setFailed('Failed');
+      core.error('stderr: ' + stdout);
+    } else {
+      core.info('stdour: ' + stdout);
     }
     core.endGroup();
   } catch (error: any) {
