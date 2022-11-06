@@ -17,26 +17,8 @@ const buildCoverageShell = (): string => {
 argThreshold=${threshold}
 
 tests=\`go tool cover -func=cover.out\`
-failed=false
-
-echo "Threshold: $argThreshold"
-echo $tests
-
-while IFS= read -r t
-do
-  num=\`echo $t | grep -Eo '[0-9]+\.[0-9]+'\`
-  if (( $(echo "$num $argThreshold" | awk '{print ($1 < $2)}') )) ; then
-    failed=true
-    echo $t;
-  else
-    echo $t;
-  fi
-done <<< "$tests"
-
-if $failed ; then
-  echo "Failed"
-  exit 1
-fi`;
+echo "$tests"
+`;
 };
 
 const output = (result: SpawnSyncReturns<Buffer>): void => {
@@ -53,14 +35,24 @@ const run = async () => {
     core.startGroup('go test');
     const goTestShell = buildGoTestShell();
     let result = spawnSync(goTestShell, {shell: '/bin/bash'});
-    let stdout = result.stdout.toString();
     output(result);
     core.endGroup();
 
     core.startGroup('test coverage');
     const coverageShell = buildCoverageShell();
     result = spawnSync(coverageShell, {shell: '/bin/bash'});
-    output(result);
+    const rows = result.stdout.toString().split(/\n/);
+    core.info("row 1:" + rows[0]);
+    const cols = rows[0].split(/\t/)
+    core.info("col 1:" + cols[0])
+    core.info("col 2:" + cols[1])
+    core.info("col 3:" + cols[2])
+    core.info("col 4:" + cols[3])
+    core.info("col 1:" + cols[0])
+    core.info("row 2:" + rows[1]);
+    core.info("row 3:" + rows[2]);
+    core.info("row 4:" + rows[3]);
+    // output(result);
     core.endGroup();
   } catch (error: any) {
     core.setFailed(error.status);
