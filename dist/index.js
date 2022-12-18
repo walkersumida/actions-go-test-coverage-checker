@@ -2760,7 +2760,10 @@ const outputTest = (result) => {
 const outputCoverage = (result) => {
     if (result.path == TOTAL_PATH_KEY) {
         if (result.coverage < Number(core.getInput('threshold', { required: false }))) {
-            core.setFailed(`Coverage is lower than threshold. coverage: ${result.coverage}%`);
+            core.setFailed(`Coverage is lower than threshold. Total: ${result.coverage}%`);
+        }
+        else {
+            core.info(`Total: ${result.coverage}%`);
         }
     }
     else {
