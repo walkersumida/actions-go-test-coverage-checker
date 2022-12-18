@@ -4,6 +4,13 @@ import {spawnSync, SpawnSyncReturns} from 'child_process';
 const COL_FILE_PATH = 0;
 const COL_FUNC_NAME = 1;
 const COL_COVERAGE = 2;
+const TOTAL_PATH_KEY = "total:";
+
+interface CoverResult {
+  path: string;
+  funcName: string;
+  coverage: number;
+}
 
 const buildGoTestShell = (): string => {
   const path = core.getInput('path', {required: false});
@@ -25,7 +32,7 @@ echo "$tests"
 `;
 };
 
-const output = (result: SpawnSyncReturns<Buffer>): void => {
+const outputTest = (result: SpawnSyncReturns<Buffer>): void => {
   if (result.status == 1) {
     core.setFailed('Failed');
     core.error(result.stdout.toString());
@@ -34,13 +41,17 @@ const output = (result: SpawnSyncReturns<Buffer>): void => {
   }
 }
 
-interface TestResult {
-  path: string;
-  funcName: string;
-  coverage: number;
+const outputCoverage = (result: CoverResult): void => {
+  if (result.path == TOTAL_PATH_KEY) {
+    if (result.coverage < Number(core.getInput('threshold', {required: false}))) {
+      core.setFailed(`Coverage is lower than threshold. coverage: ${result.coverage}%`);
+    }
+  } else {
+    core.info(`path: ${result.path}, funcName: ${result.funcName}, coverage: ${result.coverage}%`);
+  }
 }
 
-const parseTestResult = (result: string): TestResult => {
+const parseCoverResult = (result: string): CoverResult => {
   const cols = result.split(/\t/);
   let buildCols = [];
   for (let i = 0; i < cols.length; i++) {
@@ -58,12 +69,14 @@ const parseTestResult = (result: string): TestResult => {
 
 const run = async () => {
   try {
+    // go test
     core.startGroup('go test');
     const goTestShell = buildGoTestShell();
     let result = spawnSync(goTestShell, {shell: '/bin/bash'});
-    output(result);
+    outputTest(result);
     core.endGroup();
 
+    // go text coverage
     core.startGroup('test coverage');
     const coverageShell = buildCoverageShell();
     result = spawnSync(coverageShell, {shell: '/bin/bash'});
@@ -71,8 +84,8 @@ const run = async () => {
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
       if (row != "") {
-        const testResult = parseTestResult(row);
-        core.info(`path: ${testResult.path}, funcName: ${testResult.funcName}, coverage: ${testResult.coverage}`);
+        const coverResult = parseCoverResult(row);
+        outputCoverage(coverResult);
       }
     }
     core.endGroup();

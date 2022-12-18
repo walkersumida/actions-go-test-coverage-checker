@@ -2731,6 +2731,7 @@ const child_process_1 = __nccwpck_require__(81);
 const COL_FILE_PATH = 0;
 const COL_FUNC_NAME = 1;
 const COL_COVERAGE = 2;
+const TOTAL_PATH_KEY = "total:";
 const buildGoTestShell = () => {
     const path = core.getInput('path', { required: false });
     return `#!/bin/bash
@@ -2747,7 +2748,7 @@ tests=\`go tool cover -func=cover.out\`
 echo "$tests"
 `;
 };
-const output = (result) => {
+const outputTest = (result) => {
     if (result.status == 1) {
         core.setFailed('Failed');
         core.error(result.stdout.toString());
@@ -2756,7 +2757,17 @@ const output = (result) => {
         core.info(result.stdout.toString());
     }
 };
-const parseTestResult = (result) => {
+const outputCoverage = (result) => {
+    if (result.path == TOTAL_PATH_KEY) {
+        if (result.coverage < Number(core.getInput('threshold', { required: false }))) {
+            core.setFailed(`Coverage is lower than threshold. coverage: ${result.coverage}%`);
+        }
+    }
+    else {
+        core.info(`path: ${result.path}, funcName: ${result.funcName}, coverage: ${result.coverage}%`);
+    }
+};
+const parseCoverResult = (result) => {
     const cols = result.split(/\t/);
     let buildCols = [];
     for (let i = 0; i < cols.length; i++) {
@@ -2772,11 +2783,13 @@ const parseTestResult = (result) => {
 };
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        // go test
         core.startGroup('go test');
         const goTestShell = buildGoTestShell();
         let result = (0, child_process_1.spawnSync)(goTestShell, { shell: '/bin/bash' });
-        output(result);
+        outputTest(result);
         core.endGroup();
+        // go text coverage
         core.startGroup('test coverage');
         const coverageShell = buildCoverageShell();
         result = (0, child_process_1.spawnSync)(coverageShell, { shell: '/bin/bash' });
@@ -2784,8 +2797,8 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         for (let i = 0; i < rows.length; i++) {
             const row = rows[i];
             if (row != "") {
-                const testResult = parseTestResult(row);
-                core.info(`path: ${testResult.path}, funcName: ${testResult.funcName}, coverage: ${testResult.coverage}`);
+                const coverResult = parseCoverResult(row);
+                outputCoverage(coverResult);
             }
         }
         core.endGroup();
