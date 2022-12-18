@@ -2728,6 +2728,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(186));
 const child_process_1 = __nccwpck_require__(81);
+const COL_FILE_PATH = 0;
+const COL_FUNC_NAME = 1;
+const COL_COVERAGE = 2;
 const buildGoTestShell = () => {
     const path = core.getInput('path', { required: false });
     return `#!/bin/bash
@@ -2753,6 +2756,20 @@ const output = (result) => {
         core.info(result.stdout.toString());
     }
 };
+const parseTestResult = (result) => {
+    const cols = result.split(/\t/);
+    let buildCols = [];
+    for (let i = 0; i < cols.length; i++) {
+        if (cols[i] != "") {
+            buildCols.push(cols[i]);
+        }
+    }
+    return {
+        path: buildCols[COL_FILE_PATH],
+        funcName: buildCols[COL_FUNC_NAME],
+        coverage: Number(buildCols[COL_COVERAGE].replace("%", "")),
+    };
+};
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         core.startGroup('go test');
@@ -2764,17 +2781,13 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         const coverageShell = buildCoverageShell();
         result = (0, child_process_1.spawnSync)(coverageShell, { shell: '/bin/bash' });
         const rows = result.stdout.toString().split(/\n/);
-        core.info("row 1:" + rows[0]);
-        const cols = rows[0].split(/\t/);
-        core.info("col 1:" + cols[0]);
-        core.info("col 2:" + cols[1]);
-        core.info("col 3:" + cols[2]);
-        core.info("col 4:" + cols[3]);
-        core.info("col 1:" + cols[0]);
-        core.info("row 2:" + rows[1]);
-        core.info("row 3:" + rows[2]);
-        core.info("row 4:" + rows[3]);
-        // output(result);
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            if (row != "") {
+                const testResult = parseTestResult(row);
+                core.info(`path: ${testResult.path}, funcName: ${testResult.funcName}, coverage: ${testResult.coverage}`);
+            }
+        }
         core.endGroup();
     }
     catch (error) {
