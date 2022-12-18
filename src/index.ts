@@ -43,8 +43,11 @@ const outputTest = (result: SpawnSyncReturns<Buffer>): void => {
 
 const outputCoverage = (result: CoverResult): void => {
   if (result.path == TOTAL_PATH_KEY) {
-    if (result.coverage < Number(core.getInput('threshold', {required: false}))) {
-      core.setFailed(`Coverage is lower than threshold. Total: ${result.coverage}%`);
+    const threshold = core.getInput('threshold', {required: false});
+    if (result.coverage < Number(threshold)) {
+      core.setFailed(`Coverage is lower than threshold.`);
+      core.setFailed(`Total: ${result.coverage}%`);
+      core.setFailed(`Threshold: ${threshold}%`);
     } else {
       core.info(`Total: ${result.coverage}%`);
     }
